@@ -95,37 +95,23 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo 'Сборка Docker образов...'
-                script {
-                    sh 'docker compose build'
-                }
+                sh 'docker-compose build'
             }
         }
         
         stage('Deploy to Docker') {
             steps {
                 echo 'Развертывание в Docker...'
-                script {
-                    sh 'docker compose down --remove-orphans || true'
-                    sh 'docker compose up -d'
-                }
+                sh 'docker-compose down --remove-orphans || true'
+                sh 'docker-compose up -d'
             }
         }
         
         stage('Health Check') {
             steps {
                 echo 'Проверка состояния сервисов...'
-                script {
-                    sleep(time: 30, unit: 'SECONDS')
-                    
-                    // Проверка Demo REST
-                    sh 'curl -f http://localhost:8080/actuator/health || exit 1'
-                    
-                    // Проверка Prometheus
-                    sh 'curl -f http://localhost:9090/-/healthy || exit 1'
-                    
-                    // Проверка Grafana
-                    sh 'curl -f http://localhost:3000/api/health || exit 1'
-                }
+                sleep(time: 30, unit: 'SECONDS')
+                sh 'curl -f http://localhost:8080/actuator/health || exit 1'
             }
         }
     }
