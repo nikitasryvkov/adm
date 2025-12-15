@@ -102,8 +102,12 @@ pipeline {
         stage('Deploy to Docker') {
             steps {
                 echo 'Развертывание в Docker...'
-                sh 'docker-compose down --remove-orphans || true'
-                sh 'docker-compose up -d'
+                // Остановить и удалить все контейнеры из compose
+                sh 'docker-compose down --remove-orphans -v || true'
+                // Удалить конфликтующие контейнеры если есть
+                sh 'docker rm -f zipkin prometheus rabbitmq grafana jenkins demo-rest audit-service analytics-service notification-service 2>/dev/null || true'
+                // Запустить с пересозданием
+                sh 'docker-compose up -d --force-recreate'
             }
         }
         
