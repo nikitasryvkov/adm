@@ -81,21 +81,11 @@ pipeline {
                             sh 'chmod +x ./mvnw && ./mvnw test'
                         }
                     }
-                    post {
-                        always {
-                            junit allowEmptyResults: true, testResults: 'demo-rest/target/surefire-reports/*.xml'
-                        }
-                    }
                 }
                 stage('Test Audit Service') {
                     steps {
                         dir('audit-service') {
                             sh 'chmod +x ./mvnw && ./mvnw test'
-                        }
-                    }
-                    post {
-                        always {
-                            junit allowEmptyResults: true, testResults: 'audit-service/target/surefire-reports/*.xml'
                         }
                     }
                 }
