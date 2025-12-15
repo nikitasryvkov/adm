@@ -24,10 +24,10 @@ pipeline {
             steps {
                 echo 'Сборка контрактов...'
                 dir('events-contract') {
-                    bat 'mvnw.cmd clean install -DskipTests'
+                    sh './mvnw clean install -DskipTests'
                 }
                 dir('books-api-contract') {
-                    bat 'mvnw.cmd clean install -DskipTests'
+                    sh './mvnw clean install -DskipTests'
                 }
             }
         }
@@ -38,7 +38,7 @@ pipeline {
                     steps {
                         echo 'Сборка Demo REST...'
                         dir('demo-rest') {
-                            bat 'mvnw.cmd clean package -DskipTests'
+                            sh './mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -46,7 +46,7 @@ pipeline {
                     steps {
                         echo 'Сборка Analytics Service...'
                         dir('analytics-service') {
-                            bat 'mvnw.cmd clean package -DskipTests'
+                            sh './mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -54,7 +54,7 @@ pipeline {
                     steps {
                         echo 'Сборка Audit Service...'
                         dir('audit-service') {
-                            bat 'mvnw.cmd clean package -DskipTests'
+                            sh './mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -62,7 +62,7 @@ pipeline {
                     steps {
                         echo 'Сборка Notification Service (WS)...'
                         dir('ws') {
-                            bat 'mvnw.cmd clean package -DskipTests'
+                            sh './mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -74,7 +74,7 @@ pipeline {
                 stage('Test Demo REST') {
                     steps {
                         dir('demo-rest') {
-                            bat 'mvnw.cmd test'
+                            sh './mvnw test'
                         }
                     }
                     post {
@@ -86,7 +86,7 @@ pipeline {
                 stage('Test Audit Service') {
                     steps {
                         dir('audit-service') {
-                            bat 'mvnw.cmd test'
+                            sh './mvnw test'
                         }
                     }
                     post {
@@ -102,7 +102,7 @@ pipeline {
             steps {
                 echo 'Сборка Docker образов...'
                 script {
-                    bat 'docker-compose build'
+                    sh 'docker-compose build'
                 }
             }
         }
@@ -111,8 +111,8 @@ pipeline {
             steps {
                 echo 'Развертывание в Docker...'
                 script {
-                    bat 'docker-compose down --remove-orphans || exit 0'
-                    bat 'docker-compose up -d'
+                    sh 'docker-compose down --remove-orphans || true'
+                    sh 'docker-compose up -d'
                 }
             }
         }
@@ -124,19 +124,13 @@ pipeline {
                     sleep(time: 30, unit: 'SECONDS')
                     
                     // Проверка Demo REST
-                    bat '''
-                        curl -f http://localhost:8080/actuator/health || exit 1
-                    '''
+                    sh 'curl -f http://localhost:8080/actuator/health || exit 1'
                     
                     // Проверка Prometheus
-                    bat '''
-                        curl -f http://localhost:9090/-/healthy || exit 1
-                    '''
+                    sh 'curl -f http://localhost:9090/-/healthy || exit 1'
                     
                     // Проверка Grafana
-                    bat '''
-                        curl -f http://localhost:3000/api/health || exit 1
-                    '''
+                    sh 'curl -f http://localhost:3000/api/health || exit 1'
                 }
             }
         }
@@ -145,7 +139,7 @@ pipeline {
     post {
         always {
             echo 'Pipeline завершен'
-            cleanWs()
+            deleteDir()
         }
         success {
             echo 'Сборка успешно завершена!'
@@ -155,4 +149,3 @@ pipeline {
         }
     }
 }
-
