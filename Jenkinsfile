@@ -104,10 +104,10 @@ pipeline {
                 echo 'Развертывание в Docker...'
                 // Остановить и удалить все контейнеры из compose
                 sh 'docker-compose down --remove-orphans -v || true'
-                // Удалить конфликтующие контейнеры если есть
-                sh 'docker rm -f zipkin prometheus rabbitmq grafana jenkins demo-rest audit-service analytics-service notification-service 2>/dev/null || true'
-                // Запустить с пересозданием
-                sh 'docker-compose up -d --force-recreate'
+                // Удалить конфликтующие контейнеры если есть (НЕ удаляем jenkins!)
+                sh 'docker rm -f zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service 2>/dev/null || true'
+                // Запустить с пересозданием (без jenkins - он уже работает отдельно)
+                sh 'docker-compose up -d --force-recreate --scale jenkins=0 || docker-compose up -d --force-recreate'
             }
         }
         
