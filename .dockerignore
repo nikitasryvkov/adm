@@ -1,0 +1,47 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea
+*.iml
+.vscode
+*.swp
+*.swo
+
+# Maven
+*/target/
+*/.mvn/
+*/mvnw
+*/mvnw.cmd
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+*.jar
+!*/lib/*.jar
+
+# Documentation
+*.md
+LICENSE
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+
+# CI/CD
+Jenkinsfile
+.github/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Grafana data (will be created by docker)
+grafana-data/
+
+# Jenkins data (will be created by docker)
+jenkins-data/
+

@@ -1,0 +1,62 @@
+# Jenkins Configuration as Code
+jenkins:
+  systemMessage: "Microservices CI/CD Pipeline - Configured automatically"
+  
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"
+  
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "JAVA_HOME"
+            value: "/opt/java/openjdk"
+
+tool:
+  jdk:
+    installations:
+      - name: "JDK21"
+        home: "/opt/java/openjdk"
+  
+  maven:
+    installations:
+      - name: "Maven"
+        properties:
+          - installSource:
+              installers:
+                - maven:
+                    id: "3.9.6"
+
+jobs:
+  - script: >
+      pipelineJob('microservices-pipeline') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('/workspace')
+                }
+                branches('*/main', '*/master')
+              }
+            }
+            scriptPath('Jenkinsfile')
+          }
+        }
+        triggers {
+          scm('H/5 * * * *')
+        }
+      }
+
+unclassified:
+  location:
+    url: "http://localhost:8085/"
+    adminAddress: "admin@localhost"
+
