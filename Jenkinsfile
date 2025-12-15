@@ -95,7 +95,19 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo 'Сборка Docker образов...'
-                sh 'docker-compose build'
+                script {
+                    // Установить docker-compose если его нет
+                    sh '''
+                        if ! command -v docker-compose &> /dev/null; then
+                            echo "Установка docker-compose..."
+                            curl -SL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /tmp/docker-compose
+                            chmod +x /tmp/docker-compose
+                            sudo mv /tmp/docker-compose /usr/local/bin/docker-compose || mv /tmp/docker-compose /usr/local/bin/docker-compose
+                        fi
+                        docker-compose --version
+                    '''
+                    sh 'docker-compose build'
+                }
             }
         }
         
@@ -103,17 +115,23 @@ pipeline {
             steps {
                 echo 'Развертывание в Docker...'
                 script {
+                    // Убедиться что docker-compose установлен
+                    sh '''
+                        if ! command -v docker-compose &> /dev/null; then
+                            curl -SL https://github.com/docker/compose/releases/download/v2.24.0/docker-compose-linux-x86_64 -o /tmp/docker-compose
+                            chmod +x /tmp/docker-compose
+                            sudo mv /tmp/docker-compose /usr/local/bin/docker-compose || mv /tmp/docker-compose /usr/local/bin/docker-compose
+                        fi
+                    '''
                     // Остановить и удалить все контейнеры из compose
                     sh 'docker-compose down --remove-orphans -v || true'
                     
                     // Удалить ВСЕ конфликтующие контейнеры (включая остановленные)
                     sh '''
+                        # Удалить по имени (включая остановленные)
                         docker rm -f zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service 2>/dev/null || true
-                        # Удалить по ID если не удалось по имени
-                        docker ps -aq --filter "name=zipkin" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
-                        docker ps -aq --filter "name=prometheus" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
-                        docker ps -aq --filter "name=rabbitmq" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
-                        docker ps -aq --filter "name=grafana" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
+                        # Дополнительно удалить по ID на случай если имя не совпадает точно
+                        docker ps -a | grep -E "zipkin|prometheus|rabbitmq|grafana|demo-rest|audit-service|analytics-service|notification-service" | awk '{print $1}' | xargs docker rm -f 2>/dev/null || true
                     '''
                     
                     // Запустить с пересозданием (без jenkins - он уже работает отдельно)
