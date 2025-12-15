@@ -102,12 +102,23 @@ pipeline {
         stage('Deploy to Docker') {
             steps {
                 echo 'Развертывание в Docker...'
-                // Остановить и удалить все контейнеры из compose
-                sh 'docker-compose down --remove-orphans -v || true'
-                // Удалить конфликтующие контейнеры если есть (НЕ удаляем jenkins!)
-                sh 'docker rm -f zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service 2>/dev/null || true'
-                // Запустить с пересозданием (без jenkins - он уже работает отдельно)
-                sh 'docker-compose up -d --force-recreate --scale jenkins=0 || docker-compose up -d --force-recreate'
+                script {
+                    // Остановить и удалить все контейнеры из compose
+                    sh 'docker-compose down --remove-orphans -v || true'
+                    
+                    // Удалить ВСЕ конфликтующие контейнеры (включая остановленные)
+                    sh '''
+                        docker rm -f zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service 2>/dev/null || true
+                        # Удалить по ID если не удалось по имени
+                        docker ps -aq --filter "name=zipkin" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
+                        docker ps -aq --filter "name=prometheus" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
+                        docker ps -aq --filter "name=rabbitmq" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
+                        docker ps -aq --filter "name=grafana" | while read id; do docker rm -f "$id" 2>/dev/null || true; done
+                    '''
+                    
+                    // Запустить с пересозданием (без jenkins - он уже работает отдельно)
+                    sh 'docker-compose up -d --force-recreate --scale jenkins=0'
+                }
             }
         }
         
