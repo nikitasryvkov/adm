@@ -128,10 +128,27 @@ pipeline {
                     
                     // Удалить ВСЕ конфликтующие контейнеры (включая остановленные)
                     sh '''
-                        # Удалить по имени (включая остановленные)
-                        docker rm -f zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service 2>/dev/null || true
-                        # Дополнительно удалить по ID на случай если имя не совпадает точно
-                        docker ps -a | grep -E "zipkin|prometheus|rabbitmq|grafana|demo-rest|audit-service|analytics-service|notification-service" | awk '{print $1}' | xargs docker rm -f 2>/dev/null || true
+                        # Найти docker (может быть в разных местах)
+                        for docker_cmd in docker /usr/local/bin/docker /usr/bin/docker; do
+                            if command -v "$docker_cmd" &> /dev/null || [ -x "$docker_cmd" ]; then
+                                DOCKER="$docker_cmd"
+                                break
+                            fi
+                        done
+                        
+                        if [ -z "$DOCKER" ]; then
+                            echo "Docker не найден, пропускаем удаление контейнеров"
+                        else
+                            # Удалить все контейнеры с нужными именами
+                            for name in zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service; do
+                                # Удалить по имени
+                                $DOCKER rm -f "$name" 2>/dev/null || true
+                                # Удалить по ID если контейнер существует
+                                $DOCKER ps -aq --filter "name=^${name}$" 2>/dev/null | while read id; do
+                                    [ -n "$id" ] && $DOCKER rm -f "$id" 2>/dev/null || true
+                                done
+                            done
+                        fi
                     '''
                     
                     // Запустить с пересозданием (без jenkins - он уже работает отдельно)
