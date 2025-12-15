@@ -23,11 +23,15 @@ pipeline {
         stage('Build Contracts') {
             steps {
                 echo 'Сборка контрактов...'
-                dir('events-contract') {
-                    sh 'chmod +x ./mvnw && ./mvnw clean install -DskipTests'
+                retry(3) {
+                    dir('events-contract') {
+                        sh 'chmod +x ./mvnw && ./mvnw clean install -DskipTests'
+                    }
                 }
-                dir('books-api-contract') {
-                    sh 'chmod +x ./mvnw && ./mvnw clean install -DskipTests'
+                retry(3) {
+                    dir('books-api-contract') {
+                        sh 'chmod +x ./mvnw && ./mvnw clean install -DskipTests'
+                    }
                 }
             }
         }
