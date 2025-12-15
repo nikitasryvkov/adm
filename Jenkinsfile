@@ -1,11 +1,6 @@
 pipeline {
     agent any
     
-    tools {
-        maven 'Maven'
-        jdk 'JDK21'
-    }
-    
     environment {
         DOCKER_REGISTRY = 'localhost:5000'
         APP_VERSION = "${env.BUILD_NUMBER}"
@@ -13,7 +8,6 @@ pipeline {
     
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
-        timestamps()
         timeout(time: 30, unit: 'MINUTES')
         disableConcurrentBuilds()
     }
