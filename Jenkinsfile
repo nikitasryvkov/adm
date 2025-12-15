@@ -96,7 +96,7 @@ pipeline {
             steps {
                 echo 'Сборка Docker образов...'
                 script {
-                    sh 'docker-compose build'
+                    sh 'docker compose build'
                 }
             }
         }
@@ -105,8 +105,8 @@ pipeline {
             steps {
                 echo 'Развертывание в Docker...'
                 script {
-                    sh 'docker-compose down --remove-orphans || true'
-                    sh 'docker-compose up -d'
+                    sh 'docker compose down --remove-orphans || true'
+                    sh 'docker compose up -d'
                 }
             }
         }
