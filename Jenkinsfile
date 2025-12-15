@@ -126,29 +126,42 @@ pipeline {
                     // Остановить и удалить все контейнеры из compose
                     sh 'docker-compose down --remove-orphans -v || true'
                     
-                    // Удалить ВСЕ конфликтующие контейнеры (включая остановленные)
+                    // Удалить ВСЕ конфликтующие контейнеры (включая запущенные в Docker Desktop)
                     sh '''
-                        # Найти docker (может быть в разных местах)
-                        for docker_cmd in docker /usr/local/bin/docker /usr/bin/docker; do
-                            if command -v "$docker_cmd" &> /dev/null || [ -x "$docker_cmd" ]; then
-                                DOCKER="$docker_cmd"
-                                break
+                        # Найти docker
+                        DOCKER=$(command -v docker || echo "docker")
+                        
+                        # Список контейнеров для удаления
+                        CONTAINERS="zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service"
+                        
+                        # Удалить все контейнеры по имени (включая остановленные)
+                        for name in $CONTAINERS; do
+                            echo "Удаление контейнера: $name"
+                            # Остановить и удалить по имени
+                            $DOCKER stop "$name" 2>/dev/null || true
+                            $DOCKER rm -f "$name" 2>/dev/null || true
+                            
+                            # Найти и удалить по ID (включая с префиксами проекта)
+                            $DOCKER ps -aq --filter "name=${name}" 2>/dev/null | while read id; do
+                                if [ -n "$id" ]; then
+                                    echo "Остановка контейнера по ID: $id"
+                                    $DOCKER stop "$id" 2>/dev/null || true
+                                    $DOCKER rm -f "$id" 2>/dev/null || true
+                                fi
+                            done
+                        done
+                        
+                        # Дополнительно: найти и удалить все контейнеры с нужными именами
+                        $DOCKER ps -a --format "{{.ID}} {{.Names}}" 2>/dev/null | grep -iE "(zipkin|prometheus|rabbitmq|grafana|demo-rest|audit-service|analytics-service|notification-service)" | awk '{print $1}' | while read id; do
+                            if [ -n "$id" ]; then
+                                echo "Удаление контейнера по ID из списка: $id"
+                                $DOCKER stop "$id" 2>/dev/null || true
+                                $DOCKER rm -f "$id" 2>/dev/null || true
                             fi
                         done
                         
-                        if [ -z "$DOCKER" ]; then
-                            echo "Docker не найден, пропускаем удаление контейнеров"
-                        else
-                            # Удалить все контейнеры с нужными именами
-                            for name in zipkin prometheus rabbitmq grafana demo-rest audit-service analytics-service notification-service; do
-                                # Удалить по имени
-                                $DOCKER rm -f "$name" 2>/dev/null || true
-                                # Удалить по ID если контейнер существует
-                                $DOCKER ps -aq --filter "name=^${name}$" 2>/dev/null | while read id; do
-                                    [ -n "$id" ] && $DOCKER rm -f "$id" 2>/dev/null || true
-                                done
-                            done
-                        fi
+                        echo "Проверка оставшихся контейнеров:"
+                        $DOCKER ps -a --format "{{.Names}}" | grep -iE "(zipkin|prometheus|rabbitmq|grafana|demo-rest|audit-service|analytics-service|notification-service)" || echo "Конфликтующих контейнеров не найдено"
                     '''
                     
                     // Запустить с пересозданием (без jenkins - он уже работает отдельно)
