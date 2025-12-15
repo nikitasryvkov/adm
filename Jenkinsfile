@@ -24,10 +24,10 @@ pipeline {
             steps {
                 echo 'Сборка контрактов...'
                 dir('events-contract') {
-                    sh './mvnw clean install -DskipTests'
+                    sh 'chmod +x ./mvnw && ./mvnw clean install -DskipTests'
                 }
                 dir('books-api-contract') {
-                    sh './mvnw clean install -DskipTests'
+                    sh 'chmod +x ./mvnw && ./mvnw clean install -DskipTests'
                 }
             }
         }
@@ -38,7 +38,7 @@ pipeline {
                     steps {
                         echo 'Сборка Demo REST...'
                         dir('demo-rest') {
-                            sh './mvnw clean package -DskipTests'
+                            sh 'chmod +x ./mvnw && ./mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -46,7 +46,7 @@ pipeline {
                     steps {
                         echo 'Сборка Analytics Service...'
                         dir('analytics-service') {
-                            sh './mvnw clean package -DskipTests'
+                            sh 'chmod +x ./mvnw && ./mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -54,7 +54,7 @@ pipeline {
                     steps {
                         echo 'Сборка Audit Service...'
                         dir('audit-service') {
-                            sh './mvnw clean package -DskipTests'
+                            sh 'chmod +x ./mvnw && ./mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -62,7 +62,7 @@ pipeline {
                     steps {
                         echo 'Сборка Notification Service (WS)...'
                         dir('ws') {
-                            sh './mvnw clean package -DskipTests'
+                            sh 'chmod +x ./mvnw && ./mvnw clean package -DskipTests'
                         }
                     }
                 }
@@ -74,7 +74,7 @@ pipeline {
                 stage('Test Demo REST') {
                     steps {
                         dir('demo-rest') {
-                            sh './mvnw test'
+                            sh 'chmod +x ./mvnw && ./mvnw test'
                         }
                     }
                     post {
@@ -86,7 +86,7 @@ pipeline {
                 stage('Test Audit Service') {
                     steps {
                         dir('audit-service') {
-                            sh './mvnw test'
+                            sh 'chmod +x ./mvnw && ./mvnw test'
                         }
                     }
                     post {
