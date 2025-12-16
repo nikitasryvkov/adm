@@ -34,26 +34,31 @@ tool:
                 - maven:
                     id: "3.9.6"
 
-jobs:
-  - script: >
-      pipelineJob('microservices-pipeline') {
-        definition {
-          cpsScm {
-            scm {
-              git {
-                remote {
-                  url('/workspace')
-                }
-                branches('*/main', '*/master')
-              }
-            }
-            scriptPath('Jenkinsfile')
-          }
-        }
-        triggers {
-          scm('H/5 * * * *')
-        }
-      }
+# Блок jobs отключён, чтобы JCasC не падал без плагина job-dsl.
+# Если захотите создавать джобу через код, нужно:
+# 1) установить плагин Job DSL
+# 2) раскомментировать раздел ниже
+#
+#jobs:
+#  - script: >
+#      pipelineJob('microservices-pipeline') {
+#        definition {
+#          cpsScm {
+#            scm {
+#              git {
+#                remote {
+#                  url('/workspace')
+#                }
+#                branches('*/main', '*/master')
+#              }
+#            }
+#            scriptPath('Jenkinsfile')
+#          }
+#        }
+#        triggers {
+#          scm('H/5 * * * *')
+#        }
+#      }
 
 unclassified:
   location:

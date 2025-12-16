@@ -1,6 +1,13 @@
 # ===========================================
-# Этап: Запуск (Runtime Stage)
-# Требуется предварительная сборка JAR локально
+# Этап 1: Build (используем готовый target/*.jar)
+# ===========================================
+FROM eclipse-temurin:21-jre-alpine AS builder
+WORKDIR /app
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} app.jar
+
+# ===========================================
+# Этап 2: Runtime
 # ===========================================
 FROM eclipse-temurin:21-jre-alpine
 
@@ -9,9 +16,8 @@ WORKDIR /app
 # Создаем пользователя для безопасности
 RUN addgroup -S javauser && adduser -S javauser -G javauser
 
-# Копируем собранный JAR
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
+# Копируем артефакт из build-слоя
+COPY --from=builder /app/app.jar /app/app.jar
 
 # Меняем владельца
 RUN chown -R javauser:javauser /app
