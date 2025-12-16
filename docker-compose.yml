@@ -109,8 +109,8 @@ services:
   # Analytics Service (gRPC)
   analytics-service:
     build:
-      context: ./analytics-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: analytics-service/Dockerfile
     container_name: analytics-service
     ports:
       - "9091:9090"   # gRPC порт
@@ -130,8 +130,8 @@ services:
   # Notification Service (WebSocket)
   notification-service:
     build:
-      context: ./ws
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ws/Dockerfile
     container_name: notification-service
     ports:
       - "8083:8083"
@@ -149,8 +149,8 @@ services:
   # Audit Service
   audit-service:
     build:
-      context: ./audit-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: audit-service/Dockerfile
     container_name: audit-service
     ports:
       - "8082:8082"
@@ -168,8 +168,8 @@ services:
   # Demo REST API (основной сервис)
   demo-rest:
     build:
-      context: ./demo-rest
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: demo-rest/Dockerfile
     container_name: demo-rest
     ports:
       - "8080:8080"

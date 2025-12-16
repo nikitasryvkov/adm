@@ -1,18 +1,16 @@
 # ===========================================
 # Этап 1: Build — собираем JAR внутри Docker
+# Сначала собираем events-contract, затем ws (notification-service)
 # ===========================================
 FROM maven:3.9.6-eclipse-temurin-21 AS builder
-WORKDIR /app
+WORKDIR /workspace
 
-# Кэшируем зависимости
-COPY pom.xml .
-RUN mvn -B -q -DskipTests dependency:go-offline
+# Копируем весь проект
+COPY . .
 
-# Копируем исходники
-COPY src src
-
-# Сборка (зависимости на контракты подтянутся из Maven)
-RUN mvn -B -DskipTests package
+# Собираем контракт и затем WebSocket-сервис
+RUN mvn -B -DskipTests -f events-contract/pom.xml clean install && \
+    mvn -B -DskipTests -f ws/pom.xml clean package
 
 # ===========================================
 # Этап 2: Runtime
@@ -25,7 +23,7 @@ WORKDIR /app
 RUN addgroup -S javauser && adduser -S javauser -G javauser
 
 # Копируем артефакт из build-слоя
-COPY --from=builder /app/app.jar /app/app.jar
+COPY --from=builder /workspace/ws/target/*.jar /app/app.jar
 
 # Меняем владельца
 RUN chown -R javauser:javauser /app
