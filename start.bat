@@ -20,6 +20,7 @@ echo ============================================
 echo All services started!
 echo ============================================
 echo.
+
 echo Access points:
 echo   - Demo REST API:     http://localhost:8080
 echo   - GraphQL:           http://localhost:8080/graphiql
@@ -31,5 +32,6 @@ echo   - Prometheus:        http://localhost:9090
 echo   - Grafana:           http://localhost:3000 (admin/admin)
 echo   - Jenkins:           http://localhost:8085
 echo.
+
 echo To view logs: docker-compose logs -f
 echo To stop all: docker-compose down
