@@ -1,10 +1,19 @@
 # ===========================================
-# Этап 1: Build (используем готовый target/*.jar)
+# Этап 1: Build — собираем JAR внутри Docker
 # ===========================================
-FROM eclipse-temurin:21-jre-alpine AS builder
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 WORKDIR /app
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
+
+# Кэшируем зависимости
+COPY pom.xml .
+RUN mvn -B -q -DskipTests dependency:go-offline
+
+# Копируем исходники и либы (контракты)
+COPY src src
+COPY lib lib
+
+# Сборка
+RUN mvn -B -DskipTests package
 
 # ===========================================
 # Этап 2: Runtime
