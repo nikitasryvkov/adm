@@ -1,27 +1,27 @@
 @echo off
 echo ============================================
-echo Starting Microservices with Docker Compose
+echo Запуск микросервисов через Docker Compose
 echo ============================================
 
 echo.
-echo Stopping existing containers...
+echo Остановка существующих контейнеров...
 docker-compose down --remove-orphans
 
 echo.
-echo Starting all services...
+echo Запуск всех сервисов...
 docker-compose up -d
 
 echo.
-echo Waiting for services to start...
+echo Ожидание старта сервисов...
 timeout /t 30 /nobreak
 
 echo.
 echo ============================================
-echo All services started!
+echo Все сервисы запущены!
 echo ============================================
 echo.
 
-echo Access points:
+echo Точки доступа:
 echo   - Demo REST API:     http://localhost:8080
 echo   - GraphQL:           http://localhost:8080/graphiql
 echo   - Swagger UI:        http://localhost:8080/swagger-ui.html
@@ -33,5 +33,5 @@ echo   - Grafana:           http://localhost:3000 (admin/admin)
 echo   - Jenkins:           http://localhost:8085
 echo.
 
-echo To view logs: docker-compose logs -f
-echo To stop all: docker-compose down
+echo Логи: docker-compose logs -f
+echo Остановить все: docker-compose down

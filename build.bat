@@ -1,54 +1,54 @@
 @echo off
 echo ============================================
-echo Building Microservices Project
+echo Сборка микросервисного проекта
 echo ============================================
 
 echo.
-echo [1/5] Building events-contract...
+echo [1/5] Сборка events-contract...
 cd events-contract
 call mvnw.cmd clean install -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build events-contract
+    echo ОШИБКА: Не удалось собрать events-contract
     exit /b 1
 )
 cd ..
 
 echo.
-echo [2/5] Building books-api-contract...
+echo [2/5] Сборка books-api-contract...
 cd books-api-contract
 call mvnw.cmd clean install -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build books-api-contract
+    echo ОШИБКА: Не удалось собрать books-api-contract
     exit /b 1
 )
 cd ..
 
 echo.
-echo [3/5] Building demo-rest...
+echo [3/5] Сборка demo-rest...
 cd demo-rest
 call mvnw.cmd clean package -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build demo-rest
+    echo ОШИБКА: Не удалось собрать demo-rest
     exit /b 1
 )
 cd ..
 
 echo.
-echo [4/5] Building analytics-service...
+echo [4/5] Сборка analytics-service...
 cd analytics-service
 call mvnw.cmd clean package -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build analytics-service
+    echo ОШИБКА: Не удалось собрать analytics-service
     exit /b 1
 )
 cd ..
 
 echo.
-echo [5/5] Building audit-service and ws...
+echo [5/5] Сборка audit-service и ws...
 cd audit-service
 call mvnw.cmd clean package -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build audit-service
+    echo ОШИБКА: Не удалось собрать audit-service
     exit /b 1
 )
 cd ..
@@ -56,23 +56,23 @@ cd ..
 cd ws
 call mvnw.cmd clean package -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build ws
+    echo ОШИБКА: Не удалось собрать ws
     exit /b 1
 )
 cd ..
 
 echo.
-echo [6/6] Building Docker images...
+echo [6/6] Сборка Docker-образов...
 docker-compose build
 
 echo.
 echo ============================================
-echo Build completed successfully!
+echo Сборка успешно завершена!
 echo ============================================
 echo.
-echo To start all services, run: start.bat
+echo Для запуска всех сервисов выполните: start.bat
 echo.
-echo Access points:
+echo Точки доступа:
 echo   - Demo REST API:     http://localhost:8080
 echo   - Swagger UI:        http://localhost:8080/swagger-ui.html
 echo   - RabbitMQ Console:  http://localhost:15672
