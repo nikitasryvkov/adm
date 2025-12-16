@@ -8,11 +8,10 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn -B -q -DskipTests dependency:go-offline
 
-# Копируем исходники и либы (контракты)
+# Копируем исходники
 COPY src src
-COPY lib lib
 
-# Сборка
+# Сборка (зависимости на контракты подтянутся из Maven-репозитория по pom.xml)
 RUN mvn -B -DskipTests package
 
 # ===========================================
