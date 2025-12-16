@@ -1,31 +1,31 @@
 @echo off
 echo ============================================
-echo Preparing Local Libraries for Docker Build
+echo Подготовка общих библиотек (контракты)
 echo ============================================
 
 echo.
-echo [1/2] Building and installing events-contract...
+echo [1/2] Сборка events-contract...
 cd events-contract
 call mvnw.cmd clean install -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build events-contract
+    echo ОШИБКА: Не удалось собрать events-contract
     exit /b 1
 )
 cd ..
 
 echo.
-echo [2/2] Building and installing books-api-contract...
+echo [2/2] Сборка books-api-contract...
 cd books-api-contract
 call mvnw.cmd clean install -DskipTests
 if %ERRORLEVEL% NEQ 0 (
-    echo ERROR: Failed to build books-api-contract
+    echo ОШИБКА: Не удалось собрать books-api-contract
     exit /b 1
 )
 cd ..
 
 echo.
 echo ============================================
-echo Libraries prepared successfully!
+echo Библиотеки успешно подготовлены!
 echo ============================================
 echo.
-echo Now run: build.bat
+echo Далее: запустите build.bat
