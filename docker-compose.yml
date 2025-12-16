@@ -83,9 +83,7 @@ services:
 
   # Jenkins - автоматизация сборки
   jenkins:
-    build:
-      context: ./jenkins
-      dockerfile: Dockerfile
+    image: jenkins/jenkins:lts-jdk21
     container_name: jenkins
     privileged: true
     user: root
